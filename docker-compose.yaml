@@ -1,0 +1,25 @@
+version: "3.7"
+# Base service; for extension only, not for direct use
+x-service-base: &service_base
+  image: jboss/keycloak:11.0.3
+  volumes:
+    - "./config/:/tmp/config/"
+    - "db-data:/opt/jboss/keycloak/standalone/data/"
+
+services:
+  import:
+    <<: *service_base
+    command:
+      - -Dkeycloak.migration.action=import
+      - -Dkeycloak.migration.provider=singleFile
+      - -Dkeycloak.migration.file=/tmp/config/realm-import.json
+
+  export:
+    <<: *service_base
+    command:
+      - -Dkeycloak.migration.action=export
+      - -Dkeycloak.migration.provider=singleFile
+      - -Dkeycloak.migration.file=/tmp/config/realm-export.json
+
+volumes:
+  db-data:
